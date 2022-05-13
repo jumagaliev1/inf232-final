@@ -11,92 +11,91 @@ Final project for INF 232 course
 ```SQL
 CREATE OR REPLACE procedure all_adver
  IS
-   v_rec Advertisments%ROWTYPE
-   CURSOR all_adver
+   v_rec grid_panel_advt%ROWTYPE;
+   CURSOR adver
     IS
-      SELECT id, user_id, name, image, price, description, category, location, view, slug
-      FROM Advertisments;
+      SELECT id, advertisement_user_id, advertisement_name, advertisement_image, advertisement_price, advertisement_description, advertisement_category_id, 
+      advertisement_location, advertisement_view, advertisement_slug
+      FROM grid_panel_advt;
 BEGIN
-   OPEN all_adver;
-   FETCH all_adver INTO v_rec;
-   if all_adver%notfound then
-      DBMS_OUTPUT.PUT_LINE("Data not found");
-   end if;
-   CLOSE all_adver;
+   
+   for i in adver loop
+    DBMS_OUTPUT.PUT_LINE(i.advertisement_name || ' ' || i.advertisement_price || ' ' || i.advertisement_location);
+    end loop;
+   
 END;
 ```
 ### *2.*
 ```SQL
+
 CREATE OR REPLACE procedure all_cat
  IS
-   v_rec Category%ROWTYPE
-   CURSOR all_cat
+   v_rec grid_panel_category%ROWTYPE;
+   CURSOR cats
     IS
       SELECT id, name, image, slug
-      FROM Category;
+      FROM grid_panel_category;
 BEGIN
-   OPEN all_cat;
-   FETCH all_cat INTO v_rec;
-   if all_cat%notfound then
-      DBMS_OUTPUT.PUT_LINE("Data not found");
-   end if;
-   CLOSE all_cat;
+   OPEN cats;
+    LOOP
+        FETCH cats INTO v_rec;
+        EXIT WHEN cats%notfound;
+        DBMS_OUtPUT.PUT_LINE(v_rec.id || ' ' || v_rec.name || ' ' || v_rec.image || ' ' || v_rec.slug);
+    end loop;
+   CLOSE cats;
 END;
 ```
 ### *3.*
 ```SQL
+
 CREATE OR REPLACE procedure price_asc
  IS
-   v_rec Advertisments%ROWTYPE
+   v_rec grid_panel_advt%ROWTYPE;
    CURSOR order_price_asc
    IS
-     SELECT id, user_id, name, image, price, description, category, location, view, slug
-     FROM Advertisments order by price;
+    SELECT id, advertisement_user_id, advertisement_name, advertisement_image, advertisement_price, advertisement_description, advertisement_category_id, 
+      advertisement_location, advertisement_view, advertisement_slug
+      FROM grid_panel_advt order by advertisement_price;
 BEGIN
-   OPEN order_price_asc;
-   FETCH order_price_asc INTO v_rec;
-   if order_price_asc%notfound then
-      DBMS_OUTPUT.PUT_LINE("Data not found");
-   end if;
-   CLOSE order_price_asc;
+    for i in order_price_asc loop
+    DBMS_OUTPUT.PUT_LINE(i.advertisement_name);
+    END LOOP;
+        
 END;
 ```
 ### *4.*
 ```SQL
-CREATE OR REPLACE procedure price_asc
+CREATE OR REPLACE procedure price_desc
  IS
-   v_rec Advertisments%ROWTYPE
+   v_rec grid_panel_advt%ROWTYPE;
    CURSOR order_price_desc
    IS
-     SELECT id, user_id, name, image, price, description, category, location, view, slug
-     FROM Advertisments order by price desc;
+    SELECT id, advertisement_user_id, advertisement_name, advertisement_image, advertisement_price, advertisement_description, advertisement_category_id, 
+      advertisement_location, advertisement_view, advertisement_slug
+      FROM grid_panel_advt order by advertisement_price desc;
 BEGIN
-   OPEN order_price_desc;
-   FETCH order_price_desc INTO v_rec;
-   if order_price_desc%notfound then
-      DBMS_OUTPUT.PUT_LINE("Data not found");
-   end if;
-   CLOSE order_price_desc;
+    for i in order_price_desc loop
+    DBMS_OUTPUT.PUT_LINE(i.advertisement_name);
+    END LOOP;
+        
 END;
 ```
 ### *5.*
 ```SQL
+
 CREATE OR REPLACE procedure filter_cat 
- (p1_categoty IN varchar2)
+ (p1_category IN varchar2)
  IS
-   v_rec Advertisments%ROWTYPE
-   CURSOR filter_cat_name (p_categoty IN varchar2)
+   v_rec grid_panel_advt%ROWTYPE;
+   CURSOR filter_cat_name (p_category IN varchar2)
      IS
-       SELECT id, user_id, name, image, price, description, category, location, view, slug
-       FROM Advertisments adv JOIN Category cat on adv.category = cat.id 
-       WHERE cat.name = p_category;
+       SELECT adv.id, advertisement_user_id, advertisement_name, advertisement_image, advertisement_price, 
+       advertisement_description, advertisement_category_id, advertisement_location, advertisement_view, advertisement_slug
+       FROM grid_panel_advt adv JOIN grid_panel_category cat on cat.name = p_category;
 BEGIN
-   OPEN filter_cat_name(p1_categoty);
-   FETCH filter_cat_name INTO v_rec;
-   if filter_cat_name%notfound then
-      DBMS_OUTPUT.PUT_LINE("Data not found");
-   end if;
-   CLOSE filter_cat_name;
+   for i in filter_cat_name(p1_category) loop
+    dbms_output.put_line(i.advertisement_name || ' ' || i.advertisement_price);
+    end loop;
 END;
 ```
 ### *6.*
@@ -122,40 +121,43 @@ END;
 ## Cursor (at least 4)
 ### *1. All advertisments*
 ```SQL
- CURSOR all_adver
-   IS
-     SELECT id, user_id, name, image, price, description, category, location, view, slug
-     FROM Advertisments;
+  CURSOR adver
+    IS
+      SELECT id, advertisement_user_id, advertisement_name, advertisement_image, advertisement_price, advertisement_description, advertisement_category_id, 
+      advertisement_location, advertisement_view, advertisement_slug
+      FROM grid_panel_advt;
 ```
 ### *2. All Category*
 ```SQL
-CURSOR all_cat
-   IS
-     SELECT id, name, image, slug
-     FROM Category;
+CURSOR cats
+    IS
+      SELECT id, name, image, slug
+      FROM grid_panel_category;
 ```
 ### *3. Advertisments filter order by price ascending*
 ```SQL
 CURSOR order_price_asc
    IS
-     SELECT id, user_id, name, image, price, description, category, location, view, slug
-     FROM Advertisments order by price;
+    SELECT id, advertisement_user_id, advertisement_name, advertisement_image, advertisement_price, advertisement_description, advertisement_category_id, 
+      advertisement_location, advertisement_view, advertisement_slug
+      FROM grid_panel_advt order by advertisement_price;
 ```
 ### *4. Advertisments filter order by price descending*
 ```SQL
-CURSOR order_price_desc
+CURSOR order_price_asc
    IS
-     SELECT id, user_id, name, image, price, description, category, location, view, slug
-     FROM Advertisments order by price desc;
+    SELECT id, advertisement_user_id, advertisement_name, advertisement_image, advertisement_price, advertisement_description, advertisement_category_id, 
+      advertisement_location, advertisement_view, advertisement_slug
+      FROM grid_panel_advt order by advertisement_price desc;
 ```
 
 ### *5. Advertisments filter by category name*
 ```SQL
-CURSOR filter_cat_name (p_categoty IN varchar2)
-  IS
-    SELECT id, user_id, name, image, price, description, category, location, view, slug
-    FROM Advertisments adv JOIN Category cat on adv.category = cat.id 
-    WHERE cat.name = p_category;
+CURSOR filter_cat_name (p_category IN varchar2)
+     IS
+       SELECT adv.id, advertisement_user_id, advertisement_name, advertisement_image, advertisement_price, 
+       advertisement_description, advertisement_category_id, advertisement_location, advertisement_view, advertisement_slug
+       FROM grid_panel_advt adv JOIN grid_panel_category cat on cat.name = p_category;
 ```
 
 ### *6. Advertisments filter by authors*
